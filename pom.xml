@@ -101,7 +101,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<classifier>${jar-classifier}</classifier>
 					<layers>
 						<enabled>true</enabled>
 					</layers>
