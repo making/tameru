@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,8 @@ public class LogEventStore {
 
 	private final LogEventGateway logEventGateway;
 
+	private final List<LogEventSubscriber> subscribers = new CopyOnWriteArrayList<>();
+
 	public LogEventStore(LogEventGateway logEventGateway) {
 		this.logEventGateway = logEventGateway;
 		int capacity = 10;
@@ -32,12 +35,14 @@ public class LogEventStore {
 	public void store(LogEvent logEvent) {
 		this.logEvents.put(logEvent.eventId(), logEvent);
 		this.logEventGateway.sendEvent(logEvent);
+		this.subscribers.forEach(subscriber -> subscriber.onEvent(logEvent));
 	}
 
 	public void store(List<LogEvent> logEvents) {
 		this.logEvents.putAll(logEvents.stream()
 			.collect(Collectors.toMap(LogEvent::eventId, Function.identity(), (o1, o2) -> o1, LinkedHashMap::new)));
 		this.logEventGateway.sendEvents(logEvents);
+		this.subscribers.forEach(subscriber -> logEvents.forEach(subscriber::onEvent));
 	}
 
 	public List<LogEvent> retrieveAll() {
@@ -54,6 +59,14 @@ public class LogEventStore {
 
 	public void clear() {
 		this.logEvents.clear();
+	}
+
+	public void subscribe(LogEventSubscriber subscriber) {
+		this.subscribers.add(subscriber);
+	}
+
+	public void unsubscribe(LogEventSubscriber subscriber) {
+		this.subscribers.remove(subscriber);
 	}
 
 }
