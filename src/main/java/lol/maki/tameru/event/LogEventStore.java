@@ -24,7 +24,6 @@ public class LogEventStore {
 				return size() > capacity;
 			}
 		});
-		;
 	}
 
 	public void store(LogEvent logEvent) {
