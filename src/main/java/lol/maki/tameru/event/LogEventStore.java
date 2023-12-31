@@ -17,7 +17,10 @@ public class LogEventStore {
 
 	private final Map<Timeflake, LogEvent> logEvents;
 
-	public LogEventStore() {
+	private final LogEventGateway logEventGateway;
+
+	public LogEventStore(LogEventGateway logEventGateway) {
+		this.logEventGateway = logEventGateway;
 		int capacity = 10;
 		this.logEvents = Collections.synchronizedMap(new LinkedHashMap<>(capacity, 0.75f, true) {
 			protected boolean removeEldestEntry(Map.Entry<Timeflake, LogEvent> eldest) {
@@ -28,11 +31,13 @@ public class LogEventStore {
 
 	public void store(LogEvent logEvent) {
 		this.logEvents.put(logEvent.eventId(), logEvent);
+		this.logEventGateway.sendEvent(logEvent);
 	}
 
 	public void store(List<LogEvent> logEvents) {
 		this.logEvents.putAll(logEvents.stream()
 			.collect(Collectors.toMap(LogEvent::eventId, Function.identity(), (o1, o2) -> o1, LinkedHashMap::new)));
+		this.logEventGateway.sendEvents(logEvents);
 	}
 
 	public List<LogEvent> retrieveAll() {

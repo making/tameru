@@ -67,7 +67,7 @@ public class LogEventMapper {
 		}
 		String dt = node.asText();
 		if (dt.contains(" ")) {
-			dt = dt.trim().replace(" ", "T");
+			dt = dt.trim().replace(" UTC", "Z").replace(" ", "T");
 		}
 		return Instant.parse(dt);
 	}
