@@ -28,7 +28,7 @@ public class IntegrationConfig {
 			.splitWith(spec -> spec.expectedType(LogEvent.class).<LogEvent>function(logEvent -> {
 				List<Message<?>> list = new ArrayList<>(2);
 				String eventId = logEvent.eventId().base62();
-				String directory = eventId.substring(0, 4);
+				String directory = logEvent.eventId().toUuid().toString().substring(0, 8);
 				list.add(MessageBuilder.withPayload(eventId + "," + logEvent.message())
 					.setHeader("file_name", "payload")
 					.setHeader("directory", directory)
