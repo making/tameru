@@ -34,7 +34,7 @@ public class JdbcLogEventsQuery implements LogEventsQuery {
 	public Optional<LogEvent> findByEventId(Long eventId) {
 		return this.jdbcClient.sql("""
 				SELECT event_id, message, timestamp, metadata FROM log_event WHERE event_id = ?
-								""".trim()) //
+				""".trim()) //
 			.param(eventId) //
 			.query(logEventRowMapper) //
 			.optional();
@@ -52,16 +52,14 @@ public class JdbcLogEventsQuery implements LogEventsQuery {
 
 	@Override
 	public List<LogEvent> findLatestLogEventsWithKeyword(String keyword, int size) {
-		return this.jdbcClient
-			.sql("""
-											SELECT log_event.event_id, log_event.message, log_event.timestamp, log_event.metadata
-											FROM log_event_fts
-											JOIN log_event ON log_event_fts.rowid = log_event.event_id
-											WHERE log_event_fts MATCH(?)
-											ORDER BY timestamp DESC
-					"""
-				.trim() + //
-					" LIMIT %d".formatted(size)) //
+		return this.jdbcClient.sql("""
+				SELECT log_event.event_id, log_event.message, log_event.timestamp, log_event.metadata
+				FROM log_event_fts
+				JOIN log_event ON log_event_fts.rowid = log_event.event_id
+				WHERE log_event_fts MATCH(?)
+				ORDER BY timestamp DESC
+				""".trim() + //
+				" LIMIT %d".formatted(size)) //
 			.param(keyword) //
 			.query(logEventRowMapper) //
 			.list();
