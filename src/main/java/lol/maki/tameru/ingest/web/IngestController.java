@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import am.ik.timeflake.Timeflake;
 import com.fasterxml.jackson.databind.JsonNode;
 import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventMapper;
