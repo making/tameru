@@ -7,7 +7,7 @@ import java.util.Optional;
 import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventStore;
 import lol.maki.tameru.event.LogEventSubscriber;
-import lol.maki.tameru.event.LogEventsQuery;
+import lol.maki.tameru.event.LogEventQuery;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,26 +23,26 @@ public class QueryController {
 
 	private final LogEventStore logEventStore;
 
-	private final LogEventsQuery logEventsQuery;
+	private final LogEventQuery logEventQuery;
 
-	public QueryController(LogEventStore logEventStore, LogEventsQuery logEventsQuery) {
+	public QueryController(LogEventStore logEventStore, LogEventQuery logEventQuery) {
 		this.logEventStore = logEventStore;
-		this.logEventsQuery = logEventsQuery;
+		this.logEventQuery = logEventQuery;
 	}
 
 	@GetMapping(path = "")
 	public List<LogEvent> events(@RequestParam(defaultValue = "30") int size) {
-		return this.logEventsQuery.findLatestLogEvents(size);
+		return this.logEventQuery.findLatestLogEvents(size);
 	}
 
 	@GetMapping(path = "", params = "keyword")
 	public List<LogEvent> eventsSearch(@RequestParam(defaultValue = "30") int size, @RequestParam String keyword) {
-		return this.logEventsQuery.findLatestLogEventsWithKeyword(keyword, size);
+		return this.logEventQuery.findLatestLogEventsWithKeyword(keyword, size);
 	}
 
 	@GetMapping(path = "/{eventId}")
 	public Optional<LogEvent> event(@PathVariable Long eventId) {
-		return this.logEventsQuery.findByEventId(eventId);
+		return this.logEventQuery.findByEventId(eventId);
 	}
 
 	@GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

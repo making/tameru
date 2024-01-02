@@ -3,7 +3,7 @@ package lol.maki.tameru.event;
 import java.util.List;
 import java.util.Optional;
 
-public interface LogEventsQuery {
+public interface LogEventQuery {
 
 	Optional<LogEvent> findByEventId(Long eventId);
 

@@ -13,13 +13,13 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JdbcLogEventsQuery implements LogEventsQuery {
+public class JdbcLogEventQuery implements LogEventQuery {
 
 	private final JdbcClient jdbcClient;
 
 	private final RowMapper<LogEvent> logEventRowMapper;
 
-	public JdbcLogEventsQuery(JdbcClient jdbcClient, ObjectMapper objectMapper) {
+	public JdbcLogEventQuery(JdbcClient jdbcClient, ObjectMapper objectMapper) {
 		this.jdbcClient = jdbcClient;
 		this.logEventRowMapper = (rs, rowNum) -> {
 			Long eventId = rs.getLong("event_id");
