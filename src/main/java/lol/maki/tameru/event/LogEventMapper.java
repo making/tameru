@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-import am.ik.timeflake.Timeflake;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -31,15 +30,12 @@ public class LogEventMapper {
 
 	private final Clock clock;
 
-	private final Supplier<BigInteger> randomGenerator;
-
 	private final ObjectMapper objectMapper;
 
 	private final Logger logger = LoggerFactory.getLogger(LogEventMapper.class);
 
-	public LogEventMapper(Clock clock, Supplier<BigInteger> randomGenerator, ObjectMapper objectMapper) {
+	public LogEventMapper(Clock clock, ObjectMapper objectMapper) {
 		this.clock = clock;
-		this.randomGenerator = randomGenerator;
 		this.objectMapper = objectMapper;
 	}
 
@@ -57,8 +53,7 @@ public class LogEventMapper {
 				metadata.put(field.getKey(), fieldValue(field.getValue()));
 			}
 		}
-		return new LogEvent(Timeflake.create(timestamp, this.randomGenerator.get()), message,
-				Objects.requireNonNullElse(metadata, EMPTY_MAP));
+		return new LogEvent(null, message, timestamp, Objects.requireNonNullElse(metadata, EMPTY_MAP));
 	}
 
 	private static Instant parseDt(JsonNode node) {

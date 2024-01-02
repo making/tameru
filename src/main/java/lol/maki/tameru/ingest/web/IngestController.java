@@ -42,7 +42,7 @@ public class IngestController {
 
 	@DeleteMapping(path = "/{eventId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable Timeflake eventId) {
+	public void delete(@PathVariable Long eventId) {
 		this.logEventStore.remove(eventId);
 	}
 

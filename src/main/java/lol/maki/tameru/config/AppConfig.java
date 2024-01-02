@@ -1,9 +1,6 @@
 package lol.maki.tameru.config;
 
-import java.math.BigInteger;
 import java.time.Clock;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Supplier;
 
 import am.ik.accesslogger.AccessLogger;
 
@@ -26,11 +23,6 @@ public class AppConfig {
 	@Bean
 	public Clock clock() {
 		return Clock.systemDefaultZone();
-	}
-
-	@Bean
-	public Supplier<BigInteger> randomGenerator() {
-		return () -> new BigInteger(80, ThreadLocalRandom.current());
 	}
 
 }
