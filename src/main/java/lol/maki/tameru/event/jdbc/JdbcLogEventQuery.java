@@ -62,7 +62,7 @@ public class JdbcLogEventQuery implements LogEventQuery {
 				ORDER BY timestamp DESC, event_id DESC
 				""".trim() + //
 				" LIMIT %d".formatted(size)) //
-			.param(keyword) //
+			.param("\"" + keyword + "\"") //
 			.query(logEventRowMapper) //
 			.list();
 	}
