@@ -8,4 +8,8 @@ public interface LogEventStorage {
 
 	void saveEvents(List<LogEvent> logEvents);
 
+	void remove(Long eventId);
+
+	void clear();
+
 }

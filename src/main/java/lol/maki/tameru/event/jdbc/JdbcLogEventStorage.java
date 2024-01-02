@@ -44,4 +44,14 @@ public class JdbcLogEventStorage implements LogEventStorage {
 					.toList());
 	}
 
+	@Override
+	public void remove(Long eventId) {
+		this.jdbcTemplate.update("DELETE FROM log_event WHERE event_id = ?", eventId);
+	}
+
+	@Override
+	public void clear() {
+		this.jdbcTemplate.update("DELETE FROM log_event");
+	}
+
 }
