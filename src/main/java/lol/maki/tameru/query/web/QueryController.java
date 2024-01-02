@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import lol.maki.tameru.event.LogEvent;
+import lol.maki.tameru.event.LogEventQuery;
 import lol.maki.tameru.event.LogEventStore;
 import lol.maki.tameru.event.LogEventSubscriber;
-import lol.maki.tameru.event.LogEventQuery;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
@@ -39,6 +40,9 @@ public class QueryController {
 	public List<LogEvent> eventsSearch(@RequestParam(defaultValue = "30") int size, @RequestParam String keyword) {
 		if (keyword.isEmpty()) {
 			return events(size);
+		}
+		if (keyword.length() <= 2) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the size of keyword must be greater than 2.");
 		}
 		return this.logEventQuery.findLatestLogEventsWithKeyword(keyword, size);
 	}
