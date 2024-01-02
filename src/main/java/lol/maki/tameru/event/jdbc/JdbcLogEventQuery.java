@@ -45,7 +45,7 @@ public class JdbcLogEventQuery implements LogEventQuery {
 	@Override
 	public List<LogEvent> findLatestLogEvents(int size) {
 		return this.jdbcClient.sql("""
-				SELECT event_id, message, timestamp, metadata FROM log_event ORDER BY timestamp DESC
+				SELECT event_id, message, timestamp, metadata FROM log_event ORDER BY timestamp DESC, event_id DESC
 				""".trim() + //
 				" LIMIT %d".formatted(size)) //
 			.query(logEventRowMapper) //
@@ -59,7 +59,7 @@ public class JdbcLogEventQuery implements LogEventQuery {
 				FROM log_event_fts
 				JOIN log_event ON log_event_fts.rowid = log_event.event_id
 				WHERE log_event_fts MATCH(?)
-				ORDER BY timestamp DESC
+				ORDER BY timestamp DESC, event_id DESC
 				""".trim() + //
 				" LIMIT %d".formatted(size)) //
 			.param(keyword) //
