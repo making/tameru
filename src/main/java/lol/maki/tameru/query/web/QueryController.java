@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventQuery;
-import lol.maki.tameru.event.LogEventStore;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
