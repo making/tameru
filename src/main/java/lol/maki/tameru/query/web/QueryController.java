@@ -1,33 +1,26 @@
 package lol.maki.tameru.query.web;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventQuery;
 import lol.maki.tameru.event.LogEventStore;
-import lol.maki.tameru.event.LogEventSubscriber;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 public class QueryController {
 
-	private final LogEventStore logEventStore;
-
 	private final LogEventQuery logEventQuery;
 
-	public QueryController(LogEventStore logEventStore, LogEventQuery logEventQuery) {
-		this.logEventStore = logEventStore;
+	public QueryController(LogEventQuery logEventQuery) {
 		this.logEventQuery = logEventQuery;
 	}
 
@@ -50,25 +43,6 @@ public class QueryController {
 	@GetMapping(path = "/{eventId}")
 	public Optional<LogEvent> event(@PathVariable Long eventId) {
 		return this.logEventQuery.findByEventId(eventId);
-	}
-
-	@GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public SseEmitter stream() {
-		SseEmitter emitter = new SseEmitter(-1L);
-		LogEventSubscriber subscriber = logEvent -> {
-			try {
-				emitter.send(logEvent, MediaType.APPLICATION_JSON);
-			}
-			catch (IOException e) {
-				emitter.completeWithError(e);
-			}
-		};
-		this.logEventStore.subscribe(subscriber);
-		Runnable unsubscribe = () -> this.logEventStore.unsubscribe(subscriber);
-		emitter.onCompletion(unsubscribe);
-		emitter.onError(e -> unsubscribe.run());
-		emitter.onTimeout(unsubscribe);
-		return emitter;
 	}
 
 	@GetMapping(path = "/favicon.ico")

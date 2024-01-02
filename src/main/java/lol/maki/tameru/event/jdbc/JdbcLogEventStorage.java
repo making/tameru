@@ -1,9 +1,11 @@
-package lol.maki.tameru.event;
+package lol.maki.tameru.event.jdbc;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lol.maki.tameru.event.LogEvent;
+import lol.maki.tameru.event.LogEventStorage;
 import lol.maki.tameru.json.Json;
 
 import org.springframework.jdbc.core.JdbcTemplate;
