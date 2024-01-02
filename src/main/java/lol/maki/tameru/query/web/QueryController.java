@@ -37,6 +37,9 @@ public class QueryController {
 
 	@GetMapping(path = "", params = "keyword")
 	public List<LogEvent> eventsSearch(@RequestParam(defaultValue = "30") int size, @RequestParam String keyword) {
+		if (keyword.isEmpty()) {
+			return events(size);
+		}
 		return this.logEventQuery.findLatestLogEventsWithKeyword(keyword, size);
 	}
 
