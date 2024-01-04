@@ -20,7 +20,7 @@ import am.ik.tameru.event.filter.Filter;
 
 /**
  * Converts {@link Filter.Expression} into SQLite3 metadata filter expression format.
- * (https://www.sqlite.org/json1.html)
+ * (<a href="https://www.sqlite.org/json1.html">https://www.sqlite.org/json1.html</a>)
  *
  * @author Toshiaki Maki
  */
