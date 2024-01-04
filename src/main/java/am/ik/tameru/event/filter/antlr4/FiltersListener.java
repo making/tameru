@@ -1,4 +1,4 @@
-// Generated from lol/maki/tameru/event/filter/antlr4/Filters.g4 by ANTLR 4.13.1
+// Generated from am/ik/tameru/event/filter/antlr4/Filters.g4 by ANTLR 4.13.1
 package am.ik.tameru.event.filter.antlr4;
 
 /*
