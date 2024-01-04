@@ -38,9 +38,9 @@ public class QueryController {
 	@GetMapping(path = "")
 	public List<LogEvent> events(@RequestParam(required = false) String query,
 			@RequestParam(defaultValue = "30") int size, @RequestParam(required = false) String filter) {
-		SearchRequest searchRequest = new SearchRequest(StringUtils.hasText(query) ? query : null, size,
-				StringUtils.hasText(filter) ? Filter.parser().parse(filter) : null);
-		SearchRequest.validator.validate(searchRequest).throwIfInvalid(ConstraintViolationsException::new);
+		Filter.Expression filterExpression = StringUtils.hasText(filter) ? Filter.parser().parse(filter) : null;
+		SearchRequest searchRequest = SearchRequest.validated(query, size, filterExpression)
+			.orElseThrow(ConstraintViolationsException::new);
 		return this.logEventQuery.findLatestLogEvents(searchRequest);
 	}
 
@@ -53,10 +53,11 @@ public class QueryController {
 			outputStream.write("eventId	timestamp	message	metadata".getBytes(StandardCharsets.UTF_8));
 			outputStream.write(System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 			for (LogEvent event : events) {
-				outputStream.write("%d	%s	%s	%s"
-						.formatted(event.eventId(), event.timestamp(), event.message(),
-								Json.stringify(this.objectMapper, event.metadata()))
-						.getBytes(StandardCharsets.UTF_8));
+				outputStream.write(
+						"%d	%s	%s	%s"
+							.formatted(event.eventId(), event.timestamp(), event.message(),
+									Json.stringify(this.objectMapper, event.metadata()))
+							.getBytes(StandardCharsets.UTF_8));
 				outputStream.write(System.lineSeparator().getBytes(StandardCharsets.UTF_8));
 				if (i++ % 30 == 0) {
 					outputStream.flush();
