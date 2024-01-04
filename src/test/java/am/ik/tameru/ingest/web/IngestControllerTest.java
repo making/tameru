@@ -4,7 +4,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import am.ik.tameru.event.LogEventMapper;
+import am.ik.tameru.event.LogEventConverter;
 import am.ik.tameru.event.LogEventStore;
 import am.ik.tameru.event.LogEventStorage;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // https://betterstack.com/docs/logs/http-rest-api/
 @WebMvcTest(controllers = IngestController.class)
-@Import({ LogEventMapper.class, LogEventStore.class })
+@Import({ LogEventConverter.class, LogEventStore.class })
 class IngestControllerTest {
 
 	@Autowired

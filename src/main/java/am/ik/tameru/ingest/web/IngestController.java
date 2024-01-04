@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import am.ik.tameru.event.LogEvent;
-import am.ik.tameru.event.LogEventMapper;
+import am.ik.tameru.event.LogEventConverter;
 import am.ik.tameru.event.LogEventStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import am.ik.tameru.event.LogEventSubscriber;
@@ -27,14 +27,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 public class IngestController {
 
-	private final LogEventMapper logEventMapper;
+	private final LogEventConverter logEventConverter;
 
 	private final LogEventStore logEventStore;
 
 	private final Logger log = LoggerFactory.getLogger(IngestController.class);
 
-	public IngestController(LogEventMapper logEventMapper, LogEventStore logEventStore) {
-		this.logEventMapper = logEventMapper;
+	public IngestController(LogEventConverter logEventConverter, LogEventStore logEventStore) {
+		this.logEventConverter = logEventConverter;
 		this.logEventStore = logEventStore;
 	}
 
@@ -55,7 +55,7 @@ public class IngestController {
 	}
 
 	void ingestJsonObject(JsonNode body) {
-		LogEvent logEvent = this.logEventMapper.map(body);
+		LogEvent logEvent = this.logEventConverter.convert(body);
 		this.logEventStore.store(logEvent);
 	}
 
@@ -79,7 +79,7 @@ public class IngestController {
 	}
 
 	void ingestJsonArray(Stream<JsonNode> stream) {
-		List<LogEvent> logEvents = stream.map(this.logEventMapper::map).toList();
+		List<LogEvent> logEvents = stream.map(this.logEventConverter::convert).toList();
 		this.logEventStore.store(logEvents);
 		if (log.isTraceEnabled()) {
 			log.trace("Ingest {} events", logEvents.size());

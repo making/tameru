@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LogEventMapper {
+public class LogEventConverter {
 
 	public static final String MESSAGE_KEY = "message";
 
@@ -31,14 +31,14 @@ public class LogEventMapper {
 
 	private final ObjectMapper objectMapper;
 
-	private final Logger logger = LoggerFactory.getLogger(LogEventMapper.class);
+	private final Logger logger = LoggerFactory.getLogger(LogEventConverter.class);
 
-	public LogEventMapper(Clock clock, ObjectMapper objectMapper) {
+	public LogEventConverter(Clock clock, ObjectMapper objectMapper) {
 		this.clock = clock;
 		this.objectMapper = objectMapper;
 	}
 
-	public LogEvent map(JsonNode node) {
+	public LogEvent convert(JsonNode node) {
 		String message = node.has(MESSAGE_KEY) ? node.get(MESSAGE_KEY).asText() : null;
 		Instant timestamp = node.has(DT_KEY) ? parseDt(node.get(DT_KEY)) : this.clock.instant();
 		Map<String, Object> metadata = null;
