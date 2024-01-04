@@ -44,6 +44,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>am.ik.yavi</groupId>
+			<artifactId>yavi</artifactId>
+			<version>0.13.1</version>
+		</dependency>
+		<dependency>
 			<groupId>am.ik.access-logger</groupId>
 			<artifactId>access-logger</artifactId>
 			<version>0.1.5</version>
