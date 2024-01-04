@@ -6,18 +6,19 @@ import am.ik.accesslogger.AccessLogger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 
-@Configuration
-@EnableAsync
+@Configuration(proxyBeanMethods = false)
 public class AppConfig {
 
 	@Bean
 	public AccessLogger accessLogger() {
-		return new AccessLogger(httpExchange -> {
-			final String uri = httpExchange.getRequest().getUri().getPath();
-			return uri != null && !(uri.equals("/readyz") || uri.equals("/livez") || uri.startsWith("/actuator"));
-		});
+		UriFilter uriFilter = new UriFilter();
+		return new AccessLogger(httpExchange -> uriFilter.test(httpExchange.getRequest().getUri().getPath()));
+	}
+
+	@Bean
+	public UriFilter uriFilter() {
+		return new UriFilter();
 	}
 
 	@Bean
