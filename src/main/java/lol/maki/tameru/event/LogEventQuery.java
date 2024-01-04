@@ -3,12 +3,15 @@ package lol.maki.tameru.event;
 import java.util.List;
 import java.util.Optional;
 
+import lol.maki.tameru.event.filter.Filter;
+
 public interface LogEventQuery {
 
 	Optional<LogEvent> findByEventId(Long eventId);
 
-	List<LogEvent> findLatestLogEvents(int size);
+	List<LogEvent> findLatestLogEvents(SearchRequest request);
 
-	List<LogEvent> findLatestLogEventsWithKeyword(String keyword, int size);
+	record SearchRequest(String query, int size, Filter.Expression filterExpression) {
+	}
 
 }

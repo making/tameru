@@ -55,7 +55,7 @@ public class Sqlite3FilterExpressionConverterTests {
 			.convertExpression(new Expression(AND, new Expression(EQ, new Key("genre"), new Value("drama")),
 					new Expression(GTE, new Key("year"), new Value(2020))));
 		assertThat(vectorExpr)
-			.isEqualTo("json_extract(metadata, '$.genre') == \"drama\" && json_extract(metadata, '$.year') >= 2020");
+			.isEqualTo("json_extract(metadata, '$.genre') == \"drama\" AND json_extract(metadata, '$.year') >= 2020");
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class Sqlite3FilterExpressionConverterTests {
 		// genre in ["comedy", "documentary", "drama"]
 		String vectorExpr = converter.convertExpression(
 				new Expression(IN, new Key("genre"), new Value(List.of("comedy", "documentary", "drama"))));
-		assertThat(vectorExpr).isEqualTo("json_extract(metadata, '$.genre') in [\"comedy\",\"documentary\",\"drama\"]");
+		assertThat(vectorExpr).isEqualTo("json_extract(metadata, '$.genre') IN [\"comedy\",\"documentary\",\"drama\"]");
 	}
 
 	@Test
@@ -74,7 +74,7 @@ public class Sqlite3FilterExpressionConverterTests {
 					new Expression(AND, new Expression(EQ, new Key("country"), new Value("BG")),
 							new Expression(NE, new Key("city"), new Value("Sofia")))));
 		assertThat(vectorExpr).isEqualTo(
-				"json_extract(metadata, '$.year') >= 2020 || json_extract(metadata, '$.country') == \"BG\" && json_extract(metadata, '$.city') != \"Sofia\"");
+				"json_extract(metadata, '$.year') >= 2020 OR json_extract(metadata, '$.country') == \"BG\" AND json_extract(metadata, '$.city') != \"Sofia\"");
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class Sqlite3FilterExpressionConverterTests {
 						new Expression(EQ, new Key("country"), new Value("BG")))),
 				new Expression(NIN, new Key("city"), new Value(List.of("Sofia", "Plovdiv")))));
 		assertThat(vectorExpr).isEqualTo(
-				"(json_extract(metadata, '$.year') >= 2020 || json_extract(metadata, '$.country') == \"BG\") && json_extract(metadata, '$.city') nin [\"Sofia\",\"Plovdiv\"]");
+				"(json_extract(metadata, '$.year') >= 2020 OR json_extract(metadata, '$.country') == \"BG\") AND json_extract(metadata, '$.city') NIN [\"Sofia\",\"Plovdiv\"]");
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class Sqlite3FilterExpressionConverterTests {
 				new Expression(IN, new Key("country"), new Value(List.of("BG", "NL", "US")))));
 
 		assertThat(vectorExpr).isEqualTo(
-				"json_extract(metadata, '$.isOpen') == true && json_extract(metadata, '$.year') >= 2020 && json_extract(metadata, '$.country') in [\"BG\",\"NL\",\"US\"]");
+				"json_extract(metadata, '$.isOpen') == true AND json_extract(metadata, '$.year') >= 2020 AND json_extract(metadata, '$.country') IN [\"BG\",\"NL\",\"US\"]");
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class Sqlite3FilterExpressionConverterTests {
 					new Expression(LTE, new Key("temperature"), new Value(20.13))));
 
 		assertThat(vectorExpr).isEqualTo(
-				"json_extract(metadata, '$.temperature') >= -15.6 && json_extract(metadata, '$.temperature') <= 20.13");
+				"json_extract(metadata, '$.temperature') >= -15.6 AND json_extract(metadata, '$.temperature') <= 20.13");
 	}
 
 	@Test

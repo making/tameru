@@ -38,9 +38,9 @@ public class Sqlite3FilterExpressionConverter extends AbstractFilterExpressionCo
 	private String getOperationSymbol(Expression exp) {
 		switch (exp.type()) {
 			case AND:
-				return " && ";
+				return " AND ";
 			case OR:
-				return " || ";
+				return " OR ";
 			case EQ:
 				return " == ";
 			case NE:
@@ -54,9 +54,9 @@ public class Sqlite3FilterExpressionConverter extends AbstractFilterExpressionCo
 			case GTE:
 				return " >= ";
 			case IN:
-				return " in ";
+				return " IN ";
 			case NIN:
-				return " nin ";
+				return " NIN ";
 			default:
 				throw new RuntimeException("Not supported expression type: " + exp.type());
 		}

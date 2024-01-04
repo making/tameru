@@ -1,6 +1,7 @@
 package lol.maki.tameru.event.jdbc;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,11 +9,14 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventQuery;
+import lol.maki.tameru.event.filter.converter.FilterExpressionConverter;
+import lol.maki.tameru.event.filter.converter.Sqlite3FilterExpressionConverter;
 import lol.maki.tameru.json.Json;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class JdbcLogEventQuery implements LogEventQuery {
@@ -20,6 +24,8 @@ public class JdbcLogEventQuery implements LogEventQuery {
 	private final JdbcClient jdbcClient;
 
 	private final RowMapper<LogEvent> logEventRowMapper;
+
+	private final FilterExpressionConverter converter = new Sqlite3FilterExpressionConverter();
 
 	public JdbcLogEventQuery(JdbcClient jdbcClient, ObjectMapper objectMapper) {
 		this.jdbcClient = jdbcClient;
@@ -42,27 +48,73 @@ public class JdbcLogEventQuery implements LogEventQuery {
 			.optional();
 	}
 
-	@Override
-	public List<LogEvent> findLatestLogEvents(int size) {
-		return this.jdbcClient.sql("""
-				SELECT event_id, message, timestamp, metadata FROM log_event ORDER BY timestamp DESC, event_id DESC
-				""".trim() + //
-				" LIMIT %d".formatted(size)) //
-			.query(logEventRowMapper) //
-			.list();
-	}
+	// @Override
+	// public List<LogEvent> findLatestLogEvents(int size) {
+	// return this.jdbcClient.sql("""
+	// SELECT event_id, message, timestamp, metadata FROM log_event ORDER BY timestamp
+	// DESC, event_id DESC
+	// """.trim() + //
+	// " LIMIT %d".formatted(size)) //
+	// .query(logEventRowMapper) //
+	// .list();
+	// }
+	//
+	// @Override
+	// public List<LogEvent> findLatestLogEventsWithKeyword(String keyword, int size) {
+	// return this.jdbcClient.sql("""
+	// SELECT log_event.event_id, log_event.message, log_event.timestamp,
+	// log_event.metadata
+	// FROM log_event_fts
+	// JOIN log_event ON log_event_fts.rowid = log_event.event_id
+	// WHERE log_event_fts MATCH(?)
+	// ORDER BY timestamp DESC, event_id DESC
+	// """.trim() + //
+	// " LIMIT %d".formatted(size)) //
+	// .param("\"" + keyword + "\"") //
+	// .query(logEventRowMapper) //
+	// .list();
+	// }
 
 	@Override
-	public List<LogEvent> findLatestLogEventsWithKeyword(String keyword, int size) {
-		return this.jdbcClient.sql("""
+	public List<LogEvent> findLatestLogEvents(SearchRequest request) {
+		StringBuilder sql = new StringBuilder("""
 				SELECT log_event.event_id, log_event.message, log_event.timestamp, log_event.metadata
-				FROM log_event_fts
-				JOIN log_event ON log_event_fts.rowid = log_event.event_id
-				WHERE log_event_fts MATCH(?)
+				""");
+		List<Object> params = new ArrayList<>();
+		if (StringUtils.hasText(request.query())) {
+			sql.append("""
+					FROM log_event_fts
+					JOIN log_event ON log_event_fts.rowid = log_event.event_id
+					""");
+			params.add("\"" + request.query() + "\"");
+		}
+		else {
+			sql.append("""
+					FROM log_event
+					""");
+		}
+		sql.append("""
+				WHERE 1 = 1
+				""");
+		if (StringUtils.hasText(request.query())) {
+			sql.append("""
+					AND log_event_fts MATCH(?)
+					""");
+		}
+		if (request.filterExpression() != null) {
+			sql.append("AND ")
+				.append(converter.convertExpression(request.filterExpression()))
+				.append(System.lineSeparator());
+		}
+		sql.append("""
 				ORDER BY timestamp DESC, event_id DESC
-				""".trim() + //
-				" LIMIT %d".formatted(size)) //
-			.param("\"" + keyword + "\"") //
+				""");
+		if (request.size() > 0) {
+			sql.append("LIMIT %d".formatted(request.size()));
+		}
+		System.out.println(sql);
+		return this.jdbcClient.sql(sql.toString()) //
+			.params(params) //
 			.query(logEventRowMapper) //
 			.list();
 	}
