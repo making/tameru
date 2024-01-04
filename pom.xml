@@ -15,6 +15,7 @@
 	<description>tameru</description>
 	<properties>
 		<java.version>21</java.version>
+		<antlr.version>4.13.1</antlr.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -28,6 +29,11 @@
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${antlr.version}</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.boot</groupId>-->
@@ -118,5 +124,34 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<profiles>
+		<profile>
+			<id>antlr4</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.antlr</groupId>
+						<artifactId>antlr4-maven-plugin</artifactId>
+						<version>${antlr.version}</version>
+						<configuration>
+							<sourceDirectory>${basedir}/src/main/resources/antlr4</sourceDirectory>
+							<outputDirectory>${basedir}/src/main/java</outputDirectory>
+							<!-- <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory> -->
+							<visitor>true</visitor>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>antlr4</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
