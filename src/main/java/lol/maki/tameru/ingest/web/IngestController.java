@@ -10,6 +10,8 @@ import lol.maki.tameru.event.LogEvent;
 import lol.maki.tameru.event.LogEventMapper;
 import lol.maki.tameru.event.LogEventStore;
 import lol.maki.tameru.event.LogEventSubscriber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +30,8 @@ public class IngestController {
 	private final LogEventMapper logEventMapper;
 
 	private final LogEventStore logEventStore;
+
+	private final Logger log = LoggerFactory.getLogger(IngestController.class);
 
 	public IngestController(LogEventMapper logEventMapper, LogEventStore logEventStore) {
 		this.logEventMapper = logEventMapper;
@@ -77,6 +81,9 @@ public class IngestController {
 	void ingestJsonArray(Stream<JsonNode> stream) {
 		List<LogEvent> logEvents = stream.map(this.logEventMapper::map).toList();
 		this.logEventStore.store(logEvents);
+		if (log.isTraceEnabled()) {
+			log.trace("Ingest {} events", logEvents.size());
+		}
 	}
 
 }
