@@ -98,7 +98,7 @@ DECIMAL_VALUE
     ;
 
 IDENTIFIER
-    : (LETTER | DIGIT)+
+    : (LETTER | DIGIT | SYMBOL)+
     ;
 
 fragment DECIMAL_DIGITS
@@ -112,6 +112,10 @@ fragment DIGIT
 
 fragment LETTER
     : [a-zA-Z]
+    ;
+
+fragment SYMBOL
+    : '_' | '/'
     ;
 
 WS
