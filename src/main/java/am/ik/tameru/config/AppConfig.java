@@ -11,8 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
 	@Bean
-	public AccessLogger accessLogger() {
-		UriFilter uriFilter = new UriFilter();
+	public AccessLogger accessLogger(UriFilter uriFilter) {
 		return new AccessLogger(httpExchange -> uriFilter.test(httpExchange.getRequest().getUri().getPath()));
 	}
 
