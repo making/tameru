@@ -12,6 +12,8 @@ import lol.maki.tameru.event.LogEventQuery;
 import lol.maki.tameru.event.filter.converter.FilterExpressionConverter;
 import lol.maki.tameru.event.filter.converter.Sqlite3FilterExpressionConverter;
 import lol.maki.tameru.json.Json;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -26,6 +28,8 @@ public class JdbcLogEventQuery implements LogEventQuery {
 	private final RowMapper<LogEvent> logEventRowMapper;
 
 	private final FilterExpressionConverter converter = new Sqlite3FilterExpressionConverter();
+
+	private final Logger log = LoggerFactory.getLogger(JdbcLogEventQuery.class);
 
 	public JdbcLogEventQuery(JdbcClient jdbcClient, ObjectMapper objectMapper) {
 		this.jdbcClient = jdbcClient;
@@ -112,7 +116,7 @@ public class JdbcLogEventQuery implements LogEventQuery {
 		if (request.size() > 0) {
 			sql.append("LIMIT %d".formatted(request.size()));
 		}
-		System.out.println(sql);
+		log.trace("Execute {}", sql);
 		return this.jdbcClient.sql(sql.toString()) //
 			.params(params) //
 			.query(logEventRowMapper) //
