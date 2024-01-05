@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import am.ik.tameru.event.LogEventQuery;
-import am.ik.tameru.json.Json;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import am.ik.tameru.event.LogEvent;
+import am.ik.tameru.event.LogEventQuery;
 import am.ik.tameru.event.filter.converter.FilterExpressionConverter;
 import am.ik.tameru.event.filter.converter.Sqlite3FilterExpressionConverter;
+import am.ik.tameru.json.Json;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,33 +51,6 @@ public class JdbcLogEventQuery implements LogEventQuery {
 			.query(logEventRowMapper) //
 			.optional();
 	}
-
-	// @Override
-	// public List<LogEvent> findLatestLogEvents(int size) {
-	// return this.jdbcClient.sql("""
-	// SELECT event_id, message, timestamp, metadata FROM log_event ORDER BY timestamp
-	// DESC, event_id DESC
-	// """.trim() + //
-	// " LIMIT %d".formatted(size)) //
-	// .query(logEventRowMapper) //
-	// .list();
-	// }
-	//
-	// @Override
-	// public List<LogEvent> findLatestLogEventsWithKeyword(String keyword, int size) {
-	// return this.jdbcClient.sql("""
-	// SELECT log_event.event_id, log_event.message, log_event.timestamp,
-	// log_event.metadata
-	// FROM log_event_fts
-	// JOIN log_event ON log_event_fts.rowid = log_event.event_id
-	// WHERE log_event_fts MATCH(?)
-	// ORDER BY timestamp DESC, event_id DESC
-	// """.trim() + //
-	// " LIMIT %d".formatted(size)) //
-	// .param("\"" + keyword + "\"") //
-	// .query(logEventRowMapper) //
-	// .list();
-	// }
 
 	@Override
 	public List<LogEvent> findLatestLogEvents(SearchRequest request) {
