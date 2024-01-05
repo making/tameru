@@ -82,7 +82,7 @@ public class IngestController {
 		List<LogEvent> logEvents = stream.map(this.logEventConverter::convert).toList();
 		this.logEventStore.store(logEvents);
 		if (log.isTraceEnabled()) {
-			log.trace("Ingest {} events", logEvents.size());
+			log.trace("Ingest {} event(s)", logEvents.size());
 		}
 	}
 
