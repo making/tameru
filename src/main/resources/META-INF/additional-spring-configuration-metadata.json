@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "tameru.db.path",
+      "type": "java.lang.String",
+      "description": "Description for tameru.db.path."
+    }
+  ]
+}
