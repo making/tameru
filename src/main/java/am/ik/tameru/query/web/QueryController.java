@@ -12,6 +12,8 @@ import am.ik.tameru.json.Json;
 import am.ik.yavi.core.ConstraintViolationsException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,15 +38,21 @@ public class QueryController {
 	}
 
 	@GetMapping(path = "")
-	public List<LogEvent> events(@RequestParam(required = false) String query,
-			@RequestParam(defaultValue = "30") int size, @RequestParam(required = false) String filter) {
+	public Resource index() {
+		return new ClassPathResource("META-INF/resources/index.html");
+	}
+
+	@GetMapping(path = "", params = "query")
+	public List<LogEvent> events(@RequestParam String query, @RequestParam(defaultValue = "30") int size,
+			@RequestParam(required = false) String filter) {
 		Filter.Expression filterExpression = StringUtils.hasText(filter) ? Filter.parser().parse(filter) : null;
-		SearchRequest searchRequest = SearchRequest.validated(query, size, filterExpression)
+		SearchRequest searchRequest = SearchRequest
+			.validated(StringUtils.hasText(query) ? query : null, size, filterExpression)
 			.orElseThrow(ConstraintViolationsException::new);
 		return this.logEventQuery.findLatestLogEvents(searchRequest);
 	}
 
-	@GetMapping(path = "", produces = "text/tsv")
+	@GetMapping(path = "", params = "query", produces = "text/tsv")
 	public ResponseEntity<StreamingResponseBody> eventsAsTsv(@RequestParam(required = false) String query,
 			@RequestParam(defaultValue = "30") int size, @RequestParam(required = false) String filter) {
 		List<LogEvent> events = this.events(query, size, filter);
