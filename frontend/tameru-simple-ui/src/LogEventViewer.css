@@ -1,0 +1,24 @@
+/* LogEventViewer.css */
+.overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 255, 255, 0.7);
+    padding: 10px;
+    z-index: 1000;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.table th, .table td {
+    border: 1px solid snow;
+    padding: 5px;
+}
+
+.table td {
+    text-align: left;
+}
