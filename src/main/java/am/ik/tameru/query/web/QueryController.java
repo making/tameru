@@ -1,9 +1,11 @@
 package am.ik.tameru.query.web;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import am.ik.pagination.CursorPageRequest;
 import am.ik.tameru.event.LogEvent;
 import am.ik.tameru.event.LogEventQuery;
 import am.ik.tameru.event.LogEventQuery.SearchRequest;
@@ -43,19 +45,19 @@ public class QueryController {
 	}
 
 	@GetMapping(path = "", params = "query")
-	public List<LogEvent> events(@RequestParam String query, @RequestParam(defaultValue = "30") int size,
+	public List<LogEvent> events(@RequestParam String query, CursorPageRequest<Instant> pageRequest,
 			@RequestParam(required = false) String filter) {
 		Filter.Expression filterExpression = StringUtils.hasText(filter) ? Filter.parser().parse(filter) : null;
 		SearchRequest searchRequest = SearchRequest
-			.validated(StringUtils.hasText(query) ? query : null, size, filterExpression)
+			.validated(StringUtils.hasText(query) ? query : null, pageRequest, filterExpression)
 			.orElseThrow(ConstraintViolationsException::new);
 		return this.logEventQuery.findLatestLogEvents(searchRequest);
 	}
 
 	@GetMapping(path = "", params = "query", produces = "text/tsv")
 	public ResponseEntity<StreamingResponseBody> eventsAsTsv(@RequestParam(required = false) String query,
-			@RequestParam(defaultValue = "30") int size, @RequestParam(required = false) String filter) {
-		List<LogEvent> events = this.events(query, size, filter);
+			CursorPageRequest<Instant> pageRequest, @RequestParam(required = false) String filter) {
+		List<LogEvent> events = this.events(query, pageRequest, filter);
 		StreamingResponseBody stream = outputStream -> {
 			int i = 1;
 			outputStream.write("eventId	timestamp	message	metadata".getBytes(StandardCharsets.UTF_8));

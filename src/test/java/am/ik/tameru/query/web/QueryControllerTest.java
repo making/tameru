@@ -28,7 +28,7 @@ class QueryControllerTest {
 
 	@Test
 	void eventsBadRequest() throws Exception {
-		mockMvc.perform(get("/").param("size", "0").param("query", "fo")).andExpect(content().json("""
+		mockMvc.perform(get("/").param("size", "30").param("query", "fo")).andExpect(content().json("""
 				{
 				  "type": "about:blank",
 				  "title": "Bad Request",
@@ -39,10 +39,6 @@ class QueryControllerTest {
 				    {
 				      "type": "container.greaterThanOrEqual",
 				      "message": "The size of \\"query\\" must be greater than or equal to 3. The given size is 2"
-				    },
-				    {
-				      "type": "numeric.greaterThanOrEqual",
-				      "message": "\\"size\\" must be greater than or equal to 1"
 				    }
 				  ]
 				}

@@ -1,7 +1,8 @@
 package am.ik.tameru.event.jdbc;
 
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,13 +58,12 @@ public class JdbcLogEventQuery implements LogEventQuery {
 		StringBuilder sql = new StringBuilder("""
 				SELECT log_event.event_id, log_event.message, log_event.timestamp, log_event.metadata
 				""");
-		List<Object> params = new ArrayList<>();
+		Map<String, Object> params = new HashMap<>();
 		if (StringUtils.hasText(request.query())) {
 			sql.append("""
 					FROM log_event_fts
 					JOIN log_event ON log_event_fts.rowid = log_event.event_id
 					""");
-			params.add("\"" + request.query() + "\"");
 		}
 		else {
 			sql.append("""
@@ -71,12 +71,14 @@ public class JdbcLogEventQuery implements LogEventQuery {
 					""");
 		}
 		sql.append("""
-				WHERE 1 = 1
+				WHERE timestamp < COALESCE(:cursor, 1e10000) -- Infinity
 				""");
+		params.put("cursor", request.pageRequest().cursorOptional().map(Timestamp::from).orElse(null));
 		if (StringUtils.hasText(request.query())) {
 			sql.append("""
-					AND log_event_fts MATCH(?)
+					AND log_event_fts MATCH(:query)
 					""");
+			params.put("query", "\"" + request.query() + "\"");
 		}
 		if (request.filterExpression() != null) {
 			sql.append("AND ")
@@ -86,8 +88,8 @@ public class JdbcLogEventQuery implements LogEventQuery {
 		sql.append("""
 				ORDER BY timestamp DESC, event_id DESC
 				""");
-		if (request.size() > 0) {
-			sql.append("LIMIT %d".formatted(request.size()));
+		if (request.pageRequest().pageSize() > 0) {
+			sql.append("LIMIT %d".formatted(request.pageRequest().pageSize()));
 		}
 		log.trace("Execute {}", sql);
 		return this.jdbcClient.sql(sql.toString()) //

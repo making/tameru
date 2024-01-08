@@ -49,6 +49,11 @@
 			<version>0.13.1</version>
 		</dependency>
 		<dependency>
+			<groupId>am.ik.pagination</groupId>
+			<artifactId>pagination</artifactId>
+			<version>0.2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>am.ik.access-logger</groupId>
 			<artifactId>access-logger</artifactId>
 			<version>0.2.0</version>

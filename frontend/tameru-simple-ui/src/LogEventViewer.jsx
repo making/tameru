@@ -2,6 +2,18 @@ import React, {useState} from 'react';
 import {JSONToHTMLTable} from "@kevincobain2000/json-to-html-table";
 import './LogEventViewer.css';
 
+const buildUrl = ({size, query, filter, cursor}) => {
+    let url = `/?size=${size}&query=${encodeURIComponent(query)}`;
+    if (filter) {
+        url += `&filter=${encodeURIComponent(filter)}`;
+    }
+    if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`;
+    }
+    return url;
+};
+
+
 const LogEventViewer = () => {
     const [logs, setLogs] = useState([]);
     const [query, setQuery] = useState('');
@@ -9,21 +21,36 @@ const LogEventViewer = () => {
     const [size, setSize] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
     const [jsonToTable, setJsonToTable] = useState(false);
+    const [showLoadMore, setShowLoadMore] = useState(false);
 
     const fetchLogs = async () => {
-        let url = `/?size=${size}&query=${encodeURIComponent(query)}`;
-        if (filter) {
-            url += `&filter=${encodeURIComponent(filter)}`;
-        }
+        let url = buildUrl({size, query, filter})
         setIsLoading(true);
         try {
             const response = await fetch(url);
             const data = await response.json();
             setLogs(data);
+            setShowLoadMore(data.length >= size);
         } catch (error) {
             console.error('Error fetching logs:', error);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchMoreLogs = async () => {
+        if (logs.length === 0) {
+            return;
+        }
+        const lastLogTimestamp = logs[logs.length - 1].timestamp;
+        const url = buildUrl({size, query, filter, cursor: lastLogTimestamp});
+        try {
+            const response = await fetch(url);
+            const moreLogs = await response.json();
+            setLogs([...logs, ...moreLogs]);
+            setShowLoadMore(moreLogs.length >= size);
+        } catch (error) {
+            console.error('Error fetching more logs:', error);
         }
     };
 
@@ -98,6 +125,7 @@ const LogEventViewer = () => {
             </tr>)}
             </tbody>
         </table>
+        {showLoadMore && <button onClick={fetchMoreLogs}>Load More</button>}
     </div>);
 };
 
