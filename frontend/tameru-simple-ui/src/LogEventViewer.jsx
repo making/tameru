@@ -44,6 +44,7 @@ const LogEventViewer = () => {
         }
         const lastLogTimestamp = logs[logs.length - 1].timestamp;
         const url = buildUrl({size, query, filter, cursor: lastLogTimestamp});
+        setIsLoading(true);
         try {
             const response = await fetch(url);
             const moreLogs = await response.json();
@@ -51,6 +52,8 @@ const LogEventViewer = () => {
             setShowLoadMore(moreLogs.length >= size);
         } catch (error) {
             console.error('Error fetching more logs:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -125,7 +128,8 @@ const LogEventViewer = () => {
             </tr>)}
             </tbody>
         </table>
-        {showLoadMore && <button onClick={fetchMoreLogs}>Load More</button>}
+        {showLoadMore && <button onClick={fetchMoreLogs}
+                                 disabled={isLoading}>Load More</button>}
     </div>);
 };
 
