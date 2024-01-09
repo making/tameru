@@ -1,10 +1,8 @@
 package am.ik.tameru.config;
 
-import java.time.Instant;
 import java.util.List;
 
 import am.ik.pagination.web.CursorPageRequestHandlerMethodArgumentResolver;
-import am.ik.tameru.event.LogEventQuery;
 import am.ik.tameru.event.LogEventQuery.Cursor;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
