@@ -42,8 +42,8 @@ const LogEventViewer = () => {
         if (logs.length === 0) {
             return;
         }
-        const lastLogTimestamp = logs[logs.length - 1].timestamp;
-        const url = buildUrl({size, query, filter, cursor: lastLogTimestamp});
+        var lastLog = logs[logs.length - 1];
+        const url = buildUrl({size, query, filter, cursor: `${lastLog.timestamp},${lastLog.eventId}`});
         setIsLoading(true);
         try {
             const response = await fetch(url);

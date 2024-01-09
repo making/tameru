@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 
 import am.ik.pagination.web.CursorPageRequestHandlerMethodArgumentResolver;
+import am.ik.tameru.event.LogEventQuery;
+import am.ik.tameru.event.LogEventQuery.Cursor;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(new CursorPageRequestHandlerMethodArgumentResolver<>(Instant::parse,
+		resolvers.add(new CursorPageRequestHandlerMethodArgumentResolver<>(Cursor::valueOf,
 				props -> props.withSizeDefault(30)));
 	}
 

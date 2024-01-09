@@ -59,7 +59,8 @@ public class JdbcLogEventQuery implements LogEventQuery {
 				SELECT log_event.event_id, log_event.message, log_event.timestamp, log_event.metadata
 				""");
 		Map<String, Object> params = new HashMap<>();
-		if (StringUtils.hasText(request.query())) {
+		String query = request.query();
+		if (StringUtils.hasText(query)) {
 			sql.append("""
 					FROM log_event_fts
 					JOIN log_event ON log_event_fts.rowid = log_event.event_id
@@ -71,14 +72,22 @@ public class JdbcLogEventQuery implements LogEventQuery {
 					""");
 		}
 		sql.append("""
-				WHERE timestamp < COALESCE(:cursor, 1e10000) -- Infinity
+				WHERE 1 = 1
 				""");
-		params.put("cursor", request.pageRequest().cursorOptional().map(Timestamp::from).orElse(null));
-		if (StringUtils.hasText(request.query())) {
+		Cursor cursor = request.pageRequest().cursor();
+		if (cursor != null) {
+			sql.append("""
+					AND timestamp <= COALESCE(:timestamp, 1e10000 /* Infinity */)
+					AND event_id < COALESCE(:event_id, 1e10000 /* Infinity */)
+					""");
+			params.put("timestamp", Timestamp.from(cursor.timestamp()));
+			params.put("event_id", cursor.eventId());
+		}
+		if (StringUtils.hasText(query)) {
 			sql.append("""
 					AND log_event_fts MATCH(:query)
 					""");
-			params.put("query", "\"" + request.query() + "\"");
+			params.put("query", "\"" + query + "\"");
 		}
 		if (request.filterExpression() != null) {
 			sql.append("AND ")

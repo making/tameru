@@ -1,13 +1,13 @@
 package am.ik.tameru.query.web;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import am.ik.pagination.CursorPageRequest;
 import am.ik.tameru.event.LogEvent;
 import am.ik.tameru.event.LogEventQuery;
+import am.ik.tameru.event.LogEventQuery.Cursor;
 import am.ik.tameru.event.LogEventQuery.SearchRequest;
 import am.ik.tameru.event.filter.Filter;
 import am.ik.tameru.json.Json;
@@ -45,7 +45,7 @@ public class QueryController {
 	}
 
 	@GetMapping(path = "", params = "query")
-	public List<LogEvent> events(@RequestParam String query, CursorPageRequest<Instant> pageRequest,
+	public List<LogEvent> events(@RequestParam String query, CursorPageRequest<Cursor> pageRequest,
 			@RequestParam(required = false) String filter) {
 		Filter.Expression filterExpression = StringUtils.hasText(filter) ? Filter.parser().parse(filter) : null;
 		SearchRequest searchRequest = SearchRequest
@@ -56,7 +56,7 @@ public class QueryController {
 
 	@GetMapping(path = "", params = "query", produces = "text/tsv")
 	public ResponseEntity<StreamingResponseBody> eventsAsTsv(@RequestParam(required = false) String query,
-			CursorPageRequest<Instant> pageRequest, @RequestParam(required = false) String filter) {
+			CursorPageRequest<Cursor> pageRequest, @RequestParam(required = false) String filter) {
 		List<LogEvent> events = this.events(query, pageRequest, filter);
 		StreamingResponseBody stream = outputStream -> {
 			int i = 1;

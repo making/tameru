@@ -9,7 +9,6 @@ import am.ik.tameru.event.filter.Filter;
 import am.ik.yavi.builder.ValidatorBuilder;
 import am.ik.yavi.core.ApplicativeValidator;
 import am.ik.yavi.core.Validated;
-import am.ik.yavi.core.Validator;
 
 public interface LogEventQuery {
 
@@ -17,9 +16,9 @@ public interface LogEventQuery {
 
 	List<LogEvent> findLatestLogEvents(SearchRequest request);
 
-	record SearchRequest(String query, CursorPageRequest<Instant> pageRequest, Filter.Expression filterExpression) {
+	record SearchRequest(String query, CursorPageRequest<Cursor> pageRequest, Filter.Expression filterExpression) {
 
-		public static Validated<SearchRequest> validated(String query, CursorPageRequest<Instant> pageRequest,
+		public static Validated<SearchRequest> validated(String query, CursorPageRequest<Cursor> pageRequest,
 				Filter.Expression filterExpression) {
 			return validator.validate(new SearchRequest(query, pageRequest, filterExpression));
 		}
@@ -30,6 +29,14 @@ public interface LogEventQuery {
 			.build()
 			.applicative();
 
+	}
+
+	record Cursor(Instant timestamp, Long eventId) {
+
+		public static Cursor valueOf(String s) {
+			String[] vals = s.split(",", 2);
+			return new Cursor(Instant.parse(vals[0]), Long.valueOf(vals[1]));
+		}
 	}
 
 }
