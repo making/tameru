@@ -1,4 +1,4 @@
-package am.ik.tameru.query.web;
+package am.ik.tameru.event.web;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;

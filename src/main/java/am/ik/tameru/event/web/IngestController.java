@@ -1,4 +1,4 @@
-package am.ik.tameru.ingest.web;
+package am.ik.tameru.event.web;
 
 import java.io.IOException;
 import java.util.List;

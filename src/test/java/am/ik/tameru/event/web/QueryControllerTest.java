@@ -1,4 +1,4 @@
-package am.ik.tameru.query.web;
+package am.ik.tameru.event.web;
 
 import am.ik.tameru.event.LogEventQuery;
 import org.junit.jupiter.api.Test;
