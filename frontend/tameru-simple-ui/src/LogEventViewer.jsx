@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {JSONToHTMLTable} from "@kevincobain2000/json-to-html-table";
 import ScrollToTop from "react-scroll-to-top";
 import './LogEventViewer.css';
+import logfmt from 'logfmt';
 
 const buildUrl = ({size, query, filter, cursor}) => {
     let url = `/?size=${size}&query=${encodeURIComponent(query)}`;
@@ -65,6 +66,7 @@ const LogEventViewer = () => {
     };
 
     const shouldJsonToTable = log => jsonToTable && log.message && log.message.startsWith('{') && log.message.endsWith('}');
+    const shouldLogfmtToTable = log => jsonToTable && log.message && /^[a-zA-Z0-9_]+=/.test(log.message);
 
     return (<div>
         {isLoading && <div className="overlay">Loading...</div>}
@@ -118,8 +120,10 @@ const LogEventViewer = () => {
             {logs.map(log => <tr key={log.eventId}>
                 <td>{log.eventId}</td>
                 <td>{log.timestamp}</td>
-                <td>{shouldJsonToTable(log) ?
-                    <JSONToHTMLTable data={JSON.parse(log.message)} tableClassName="table"/> : log.message}</td>
+                <td>{shouldJsonToTable(log) ? <JSONToHTMLTable data={JSON.parse(log.message)}
+                                                               tableClassName="table"/> : (shouldLogfmtToTable(log) ?
+                    <JSONToHTMLTable data={logfmt.parse(log.message)}
+                                     tableClassName="table"/> : log.message)}</td>
                 <td>
                     <JSONToHTMLTable
                         data={log.metadata || []}
