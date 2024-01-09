@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {JSONToHTMLTable} from "@kevincobain2000/json-to-html-table";
+import ScrollToTop from "react-scroll-to-top";
 import './LogEventViewer.css';
 
 const buildUrl = ({size, query, filter, cursor}) => {
@@ -130,6 +131,7 @@ const LogEventViewer = () => {
         </table>
         {showLoadMore && <button onClick={fetchMoreLogs}
                                  disabled={isLoading}>Load More</button>}
+        <ScrollToTop smooth style={{paddingLeft: '5px'}}/>
     </div>);
 };
 
