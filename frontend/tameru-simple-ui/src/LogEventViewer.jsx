@@ -22,7 +22,7 @@ const LogEventViewer = () => {
     const [filter, setFilter] = useState('');
     const [size, setSize] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
-    const [jsonToTable, setJsonToTable] = useState(false);
+    const [jsonToTable, setJsonToTable] = useState(true);
     const [showLoadMore, setShowLoadMore] = useState(false);
 
     const fetchLogs = async () => {
