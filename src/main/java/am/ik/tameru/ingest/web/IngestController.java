@@ -8,8 +8,10 @@ import java.util.stream.StreamSupport;
 import am.ik.tameru.event.LogEvent;
 import am.ik.tameru.event.LogEventConverter;
 import am.ik.tameru.event.LogEventStore;
-import com.fasterxml.jackson.databind.JsonNode;
 import am.ik.tameru.event.LogEventSubscriber;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +35,13 @@ public class IngestController {
 
 	private final Logger log = LoggerFactory.getLogger(IngestController.class);
 
-	public IngestController(LogEventConverter logEventConverter, LogEventStore logEventStore) {
+	private final Counter eventsCounter;
+
+	public IngestController(LogEventConverter logEventConverter, LogEventStore logEventStore,
+			MeterRegistry meterRegistry) {
 		this.logEventConverter = logEventConverter;
 		this.logEventStore = logEventStore;
+		this.eventsCounter = Counter.builder("tameru_events").register(meterRegistry);
 	}
 
 	@PostMapping(path = "")
@@ -57,6 +63,16 @@ public class IngestController {
 	void ingestJsonObject(JsonNode body) {
 		LogEvent logEvent = this.logEventConverter.convert(body);
 		this.logEventStore.store(logEvent);
+		this.eventsCounter.increment();
+	}
+
+	void ingestJsonArray(Stream<JsonNode> stream) {
+		List<LogEvent> logEvents = stream.map(this.logEventConverter::convert).toList();
+		this.logEventStore.store(logEvents);
+		this.eventsCounter.increment(logEvents.size());
+		if (log.isTraceEnabled()) {
+			log.trace("Ingest {} event(s)", logEvents.size());
+		}
 	}
 
 	@GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -76,14 +92,6 @@ public class IngestController {
 		emitter.onError(e -> unsubscribe.run());
 		emitter.onTimeout(unsubscribe);
 		return emitter;
-	}
-
-	void ingestJsonArray(Stream<JsonNode> stream) {
-		List<LogEvent> logEvents = stream.map(this.logEventConverter::convert).toList();
-		this.logEventStore.store(logEvents);
-		if (log.isTraceEnabled()) {
-			log.trace("Ingest {} event(s)", logEvents.size());
-		}
 	}
 
 }

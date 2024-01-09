@@ -5,8 +5,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import am.ik.tameru.event.LogEventConverter;
-import am.ik.tameru.event.LogEventStore;
 import am.ik.tameru.event.LogEventStorage;
+import am.ik.tameru.event.LogEventStore;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -73,6 +75,11 @@ class IngestControllerTest {
 		@Bean
 		public Clock clock() {
 			return Clock.fixed(timestamp, ZoneId.of("Asia/Tokyo"));
+		}
+
+		@Bean
+		public MeterRegistry meterRegistry() {
+			return new SimpleMeterRegistry();
 		}
 
 	}
