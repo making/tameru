@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import am.ik.tameru.event.LogEventConverter;
-import am.ik.tameru.event.LogEventStorage;
 import am.ik.tameru.event.LogEventStore;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -26,17 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 // https://betterstack.com/docs/logs/http-rest-api/
 @WebMvcTest(controllers = IngestController.class)
-@Import({ LogEventConverter.class, LogEventStore.class })
+@Import({ LogEventConverter.class })
 class IngestControllerTest {
 
 	@Autowired
 	MockMvc mockMvc;
 
-	@Autowired
-	LogEventStore logEventStore;
-
 	@MockBean
-	LogEventStorage logEventStorage;
+	LogEventStore logEventStore;
 
 	static Instant timestamp = Instant.parse("2023-12-30T16:41:52+09:00");
 

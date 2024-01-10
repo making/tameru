@@ -6,7 +6,7 @@ import java.util.List;
 import am.ik.tameru.json.Json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import am.ik.tameru.event.LogEvent;
-import am.ik.tameru.event.LogEventStorage;
+import am.ik.tameru.event.LogEventStore;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
-public class JdbcLogEventStorage implements LogEventStorage {
+public class JdbcLogEventStore implements LogEventStore {
 
 	private final JdbcTemplate jdbcTemplate;
 
@@ -24,7 +24,7 @@ public class JdbcLogEventStorage implements LogEventStorage {
 			INSERT INTO log_event (message, timestamp, metadata) VALUES(?, ?, ?)
 			""".trim();
 
-	public JdbcLogEventStorage(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+	public JdbcLogEventStore(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.objectMapper = objectMapper;
 	}
