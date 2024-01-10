@@ -16,11 +16,12 @@ public interface LogEventQuery {
 
 	List<LogEvent> findLatestLogEvents(SearchRequest request);
 
-	record SearchRequest(String query, CursorPageRequest<Cursor> pageRequest, Filter.Expression filterExpression) {
+	record SearchRequest(String query, CursorPageRequest<Cursor> pageRequest, Filter.Expression filterExpression,
+			Instant from, Instant to) {
 
 		public static Validated<SearchRequest> validated(String query, CursorPageRequest<Cursor> pageRequest,
-				Filter.Expression filterExpression) {
-			return validator.validate(new SearchRequest(query, pageRequest, filterExpression));
+				Filter.Expression filterExpression, Instant from, Instant to) {
+			return validator.validate(new SearchRequest(query, pageRequest, filterExpression, from, to));
 		}
 
 		private static final ApplicativeValidator<SearchRequest> validator = ValidatorBuilder.<SearchRequest>of() //

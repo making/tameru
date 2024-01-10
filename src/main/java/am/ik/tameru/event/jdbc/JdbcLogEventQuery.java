@@ -77,11 +77,23 @@ public class JdbcLogEventQuery implements LogEventQuery {
 		Cursor cursor = request.pageRequest().cursor();
 		if (cursor != null) {
 			sql.append("""
-					AND timestamp <= COALESCE(:timestamp, 1e10000 /* Infinity */)
-					AND event_id < COALESCE(:event_id, 1e10000 /* Infinity */)
+					AND timestamp <= :timestamp
+					AND event_id < :event_id
 					""");
 			params.put("timestamp", Timestamp.from(cursor.timestamp()));
 			params.put("event_id", cursor.eventId());
+		}
+		if (request.from() != null) {
+			sql.append("""
+					AND timestamp >= :from
+					""");
+			params.put("from", Timestamp.from(request.from()));
+		}
+		if (request.to() != null) {
+			sql.append("""
+					AND timestamp <= :to
+					""");
+			params.put("to", Timestamp.from(request.to()));
 		}
 		if (StringUtils.hasText(query)) {
 			sql.append("""
